@@ -13,7 +13,7 @@ void main() => runApp(MaterialApp(
   // initialRoute: "",
   routes: {
     '/': (context) => const MainScreen(),
-    '/signin': (context) => const SignInScreen(),
+    '/signin': (context) => SignInScreen(flowid: "", csrf_token: JsonObject({}),),
     '/signup': (context) => SignUpScreen(flowid: "", csrf_token: JsonObject({}),),
     '/welcome': (context) => const LandingScreen()
   }
@@ -57,8 +57,18 @@ class _MainScreenState extends State<MainScreen> {
     ));
     // Navigator.of(context).pushNamed('/signup');  // NOTE: Can use 'return_to' in reg. function to redirect; also use ui container to render the signup form; pass response data to signup page
   }
-  void _showSignInPage() {
-    Navigator.of(context).pushNamed('/signin');
+
+  void _showSignInPage() async {
+    final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
+    final response = await api.createBrowserLoginFlow();
+    String flowid = response.data!.id;
+    JsonObject? csrf_token = (response.data?.ui.nodes.first.attributes.oneOf.value as UiNodeInputAttributes).value;
+    Navigator.push(context,
+    MaterialPageRoute(
+      builder: (context) => SignInScreen(flowid: flowid, csrf_token: csrf_token!,)
+    ));
+
+    // Navigator.of(context).pushNamed('/signin');
   }
 
   @override

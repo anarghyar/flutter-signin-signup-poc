@@ -87,7 +87,7 @@ class _SignUpFormState extends State<SignUpForm> {
     });
 
 
-    final b = UpdateRegistrationFlowBody((builder) {
+    final bd = UpdateRegistrationFlowBody((builder) {
       builder
         .oneOf = OneOf.fromValue1(value: p_bd);
     });
@@ -104,7 +104,7 @@ class _SignUpFormState extends State<SignUpForm> {
     // };
 
     final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
-    final response = await api.updateRegistrationFlow(flow: widget.flowid, updateRegistrationFlowBody: b);
+    final response = await api.updateRegistrationFlow(flow: widget.flowid, updateRegistrationFlowBody: bd);
     Navigator.of(context).pushNamed('/welcome');
   }
 

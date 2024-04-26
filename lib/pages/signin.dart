@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:built_value/json_object.dart';
+import 'package:ory_client/ory_client.dart';
+import 'package:dio/dio.dart';
+import 'package:one_of/src/oneOf/one_of_base.dart';
+import 'package:dio/browser.dart';
+
 
 class SignInScreen extends StatelessWidget {
-  const SignInScreen({super.key});
+  String flowid;
+  JsonObject csrf_token;
 
+  SignInScreen({super.key, required this.flowid, required this.csrf_token});
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: const Center(
+      body: Center(
         child: SizedBox(
           width: 400,
           child: Card(
-            child: SignInForm(),
+            child: SignInForm(flowid: flowid, csrf_token: csrf_token,),
           ),
         ),
       ),
@@ -20,15 +29,55 @@ class SignInScreen extends StatelessWidget {
 }
 
 class SignInForm extends StatefulWidget {
-  const SignInForm({super.key});
+  const SignInForm({super.key, required this.flowid, required this.csrf_token});
+
+  final String flowid;
+  final JsonObject csrf_token;
 
   @override
   State<SignInForm> createState() => _SignInFormState();
 }
 
 class _SignInFormState extends State<SignInForm> {
-  final _emailTextController = TextEditingController();
+  final _idTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
+
+  final options = BaseOptions(
+    baseUrl: "http://localhost:4433",
+    connectTimeout: const Duration(seconds: 10000),
+    receiveTimeout: const Duration(seconds: 5000),
+    headers: {
+      "Accept": "application/json",
+    },
+    validateStatus: (status) {
+      // here we prevent the request from throwing an error when the status code is less than 500 (internal server error)
+      return status! < 500;
+    },
+  );
+
+  void _submitSignInPage() async {
+    print(widget.flowid);
+
+    final jsonobject = JsonObject({'email': _idTextController.text});
+
+    final p_bd = UpdateLoginFlowWithPasswordMethod((builder) {
+      builder
+        ..method = 'password'
+        ..password = _passwordTextController.text
+        ..identifier = _idTextController.text
+        ..csrfToken = widget.csrf_token.asString;
+    });
+
+    final bd = UpdateLoginFlowBody((builder) {
+      builder
+        .oneOf = OneOf.fromValue1(value: p_bd);
+    });
+
+    final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
+    final response = await api.updateLoginFlow(flow: widget.flowid, updateLoginFlowBody: bd);
+    Navigator.of(context).pushNamed('/welcome');
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +89,7 @@ class _SignInFormState extends State<SignInForm> {
           Padding(
             padding: const EdgeInsets.all(8),
             child: TextFormField(
-              controller: _emailTextController,
+              controller: _idTextController,
               decoration: const InputDecoration(hintText: 'Email'),
             ),
           ),
@@ -64,7 +113,7 @@ class _SignInFormState extends State<SignInForm> {
                     : Colors.blue;
               }),
             ),
-            onPressed: null,
+            onPressed: _submitSignInPage,
             child: const Text('Sign in'),
           ),
         ],
