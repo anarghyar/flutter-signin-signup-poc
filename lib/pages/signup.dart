@@ -47,7 +47,10 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-  final _emailTextController = TextEditingController();
+  final _uaepassEmailTextController = TextEditingController();
+  final _prefEmailTextController = TextEditingController();
+  final _uaepassPhnoTextController = TextEditingController();
+  final _prefPhnoTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
   final options = BaseOptions(
@@ -68,7 +71,12 @@ class _SignUpFormState extends State<SignUpForm> {
   void _submitSignUpPage() async {
     print(widget.flowid);
 
-    final jsonobject = JsonObject({'email': _emailTextController.text});
+    final jsonobject = JsonObject({
+      'UAEPass email': _uaepassEmailTextController.text,
+      'Preferred email': _prefEmailTextController.text,
+      'UAEPass phone': _uaepassPhnoTextController.text,
+      'Preferred phone': _prefPhnoTextController.text
+      });
 
     // final b = UpdateRegistrationFlowBody((builder) {
     //   builder
@@ -118,8 +126,29 @@ class _SignUpFormState extends State<SignUpForm> {
           Padding(
             padding: const EdgeInsets.all(8),
             child: TextFormField(
-              controller: _emailTextController,
-              decoration: const InputDecoration(hintText: 'Email'),
+              controller: _uaepassEmailTextController,
+              decoration: const InputDecoration(hintText: 'UAE Pass Email'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextFormField(
+              controller: _prefEmailTextController,
+              decoration: const InputDecoration(hintText: 'Preferred Email'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextFormField(
+              controller: _uaepassPhnoTextController,
+              decoration: const InputDecoration(hintText: 'UAE Pass Ph no'),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: TextFormField(
+              controller: _prefPhnoTextController,
+              decoration: const InputDecoration(hintText: 'Preferred Ph no'),
             ),
           ),
           Padding(

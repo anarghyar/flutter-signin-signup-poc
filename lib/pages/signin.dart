@@ -58,7 +58,7 @@ class _SignInFormState extends State<SignInForm> {
   void _submitSignInPage() async {
     print(widget.flowid);
 
-    final jsonobject = JsonObject({'email': _idTextController.text});
+    final jsonobject = JsonObject({'ID': _idTextController.text});
 
     final p_bd = UpdateLoginFlowWithPasswordMethod((builder) {
       builder
@@ -90,7 +90,7 @@ class _SignInFormState extends State<SignInForm> {
             padding: const EdgeInsets.all(8),
             child: TextFormField(
               controller: _idTextController,
-              decoration: const InputDecoration(hintText: 'Email'),
+              decoration: const InputDecoration(hintText: 'Any ID'),
             ),
           ),
           Padding(
