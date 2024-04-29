@@ -5,20 +5,16 @@ import 'package:test_flutter_application/pages/signup.dart';
 import 'package:ory_client/ory_client.dart';
 import 'package:dio/browser.dart';
 import 'package:dio/dio.dart';
-import 'package:universal_html/html.dart';
 import 'package:built_value/json_object.dart';
 
 void main() => runApp(MaterialApp(
-  // home: MainScreen(),
-  // initialRoute: "",
   routes: {
     '/': (context) => const MainScreen(),
-    '/signin': (context) => SignInScreen(flowid: "", csrf_token: JsonObject({}),),
-    '/signup': (context) => SignUpScreen(flowid: "", csrf_token: JsonObject({}),),
+    '/signin': (context) => SignInScreen(flowid: "", csrfToken: JsonObject({}),),
+    '/signup': (context) => SignUpScreen(flowid: "", csrfToken: JsonObject({}),),
     '/welcome': (context) => const LandingScreen()
   }
 ));
-
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -42,33 +38,27 @@ class _MainScreenState extends State<MainScreen> {
     },
   );
 
-  // final dio = DioForBrowser(options);
-
   void _showSignUpPage() async {
     final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
     final response = await api.createBrowserRegistrationFlow();
     String flowid = response.data!.id;
-    JsonObject? csrf_token = (response.data?.ui.nodes.first.attributes.oneOf.value as UiNodeInputAttributes).value;
-    // print(response.redirects);
+    JsonObject? csrfToken = (response.data?.ui.nodes.first.attributes.oneOf.value as UiNodeInputAttributes).value;
     Navigator.push(context,
     MaterialPageRoute(
-      builder: (context) => SignUpScreen(flowid: flowid, csrf_token: csrf_token!,)
-      // builder: (context) => const SignUpScreen()
+      builder: (context) => SignUpScreen(flowid: flowid, csrfToken: csrfToken!,)
     ));
-    // Navigator.of(context).pushNamed('/signup');  // NOTE: Can use 'return_to' in reg. function to redirect; also use ui container to render the signup form; pass response data to signup page
   }
 
   void _showSignInPage() async {
     final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
     final response = await api.createBrowserLoginFlow();
+    
     String flowid = response.data!.id;
-    JsonObject? csrf_token = (response.data?.ui.nodes.first.attributes.oneOf.value as UiNodeInputAttributes).value;
+    JsonObject? csrfToken = (response.data?.ui.nodes.first.attributes.oneOf.value as UiNodeInputAttributes).value;
     Navigator.push(context,
     MaterialPageRoute(
-      builder: (context) => SignInScreen(flowid: flowid, csrf_token: csrf_token!,)
+      builder: (context) => SignInScreen(flowid: flowid, csrfToken: csrfToken!,)
     ));
-
-    // Navigator.of(context).pushNamed('/signin');
   }
 
   @override

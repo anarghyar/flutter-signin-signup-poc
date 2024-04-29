@@ -1,22 +1,14 @@
-import 'dart:convert';
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:one_of/src/oneOf/one_of_base.dart';
 import 'package:ory_client/ory_client.dart';
 import 'package:dio/browser.dart';
 import 'package:dio/dio.dart';
-import 'package:test_flutter_application/org_main.dart';
-import 'package:universal_html/html.dart';
 import 'package:built_value/json_object.dart';
-// import 'one_of_1.dart';
 
 class SignUpScreen extends StatelessWidget {
   String flowid;
-  JsonObject csrf_token;
-  // var response;
-  SignUpScreen({super.key, required this.flowid, required this.csrf_token});
-  // const SignUpScreen({super.key});
+  JsonObject csrfToken;
+  SignUpScreen({super.key, required this.flowid, required this.csrfToken});
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +18,7 @@ class SignUpScreen extends StatelessWidget {
         child: SizedBox(
           width: 400,
           child: Card(
-            child: SignUpForm(flowid: flowid, csrf_token: csrf_token,)
-            // child: SignUpForm()
+            child: SignUpForm(flowid: flowid, csrfToken: csrfToken,)
           ),
         ),
       ),
@@ -36,11 +27,9 @@ class SignUpScreen extends StatelessWidget {
 }
 
 class SignUpForm extends StatefulWidget {
-  const SignUpForm({super.key, required this.flowid, required this.csrf_token});
-  // const SignUpForm({super.key});
-  // var response;
+  const SignUpForm({super.key, required this.flowid, required this.csrfToken});
   final String flowid;
-  final JsonObject csrf_token;
+  final JsonObject csrfToken;
 
   @override
   State<SignUpForm> createState() => _SignUpFormState();
@@ -69,50 +58,32 @@ class _SignUpFormState extends State<SignUpForm> {
   
 
   void _submitSignUpPage() async {
-    print(widget.flowid);
 
-    final jsonobject = JsonObject({
+    final traitsJsonobject = JsonObject({
       'UAEPass email': _uaepassEmailTextController.text,
       'Preferred email': _prefEmailTextController.text,
       'UAEPass phone': _uaepassPhnoTextController.text,
       'Preferred phone': _prefPhnoTextController.text
       });
-
-    // final b = UpdateRegistrationFlowBody((builder) {
-    //   builder
-    //     ..oneOf = 'password' as OneOf?
-    //     ..method = 'password'
-    //     ..password = _passwordTextController.text
-    //     ..traits = jsonobject;
-    // });
     
     final p_bd = UpdateRegistrationFlowWithPasswordMethod((builder) {
       builder
         ..method = 'password'
         ..password = _passwordTextController.text
-        ..traits = jsonobject
-        ..csrfToken = widget.csrf_token.asString;
+        ..traits = traitsJsonobject
+        ..csrfToken = widget.csrfToken.asString;
     });
-
 
     final bd = UpdateRegistrationFlowBody((builder) {
       builder
         .oneOf = OneOf.fromValue1(value: p_bd);
     });
    
+    Dio dio = DioForBrowser(options);
 
-    // UpdateRegistrationFlowBody b = UpdateRegistrationFlowBodyBuilder().build();
-    // final body = {
-    //   'traits': {
-    //     'email': _emailTextController.text
-    //   },
-    //   'password': _passwordTextController.text,
-    //   'method': 'password',
-    //   'provider': 'kratos'
-    // };
-
-    final api = OryClient(dio: DioForBrowser(options)).getFrontendApi();
+    final api = OryClient(dio: dio).getFrontendApi();
     final response = await api.updateRegistrationFlow(flow: widget.flowid, updateRegistrationFlowBody: bd);
+
     Navigator.of(context).pushNamed('/welcome');
   }
 

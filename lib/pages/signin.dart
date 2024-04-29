@@ -8,9 +8,9 @@ import 'package:dio/browser.dart';
 
 class SignInScreen extends StatelessWidget {
   String flowid;
-  JsonObject csrf_token;
+  JsonObject csrfToken;
 
-  SignInScreen({super.key, required this.flowid, required this.csrf_token});
+  SignInScreen({super.key, required this.flowid, required this.csrfToken});
   
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class SignInScreen extends StatelessWidget {
         child: SizedBox(
           width: 400,
           child: Card(
-            child: SignInForm(flowid: flowid, csrf_token: csrf_token,),
+            child: SignInForm(flowid: flowid, csrfToken: csrfToken,),
           ),
         ),
       ),
@@ -29,10 +29,10 @@ class SignInScreen extends StatelessWidget {
 }
 
 class SignInForm extends StatefulWidget {
-  const SignInForm({super.key, required this.flowid, required this.csrf_token});
+  const SignInForm({super.key, required this.flowid, required this.csrfToken});
 
   final String flowid;
-  final JsonObject csrf_token;
+  final JsonObject csrfToken;
 
   @override
   State<SignInForm> createState() => _SignInFormState();
@@ -56,16 +56,13 @@ class _SignInFormState extends State<SignInForm> {
   );
 
   void _submitSignInPage() async {
-    print(widget.flowid);
-
-    final jsonobject = JsonObject({'ID': _idTextController.text});
 
     final p_bd = UpdateLoginFlowWithPasswordMethod((builder) {
       builder
         ..method = 'password'
         ..password = _passwordTextController.text
         ..identifier = _idTextController.text
-        ..csrfToken = widget.csrf_token.asString;
+        ..csrfToken = widget.csrfToken.asString;
     });
 
     final bd = UpdateLoginFlowBody((builder) {
@@ -77,7 +74,6 @@ class _SignInFormState extends State<SignInForm> {
     final response = await api.updateLoginFlow(flow: widget.flowid, updateLoginFlowBody: bd);
     Navigator.of(context).pushNamed('/welcome');
   }
-
 
   @override
   Widget build(BuildContext context) {
